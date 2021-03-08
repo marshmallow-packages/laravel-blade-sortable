@@ -4,8 +4,8 @@
 namespace Asantibanez\LaravelBladeSortable\Components;
 
 
-use Exception;
 use Illuminate\View\Component;
+use Exception;
 
 class SortableItem extends Component
 {

@@ -41,26 +41,35 @@ class Sortable extends Component
 
     public function xInit()
     {
-        $wireOnSortOrderChange = $this->attributes->whereStartsWith('wire:onSortOrderChange')->first();
+        $wireOnSortOrderChange = $this->attributes
+                                    ->whereStartsWith('wire:onSortOrderChange')
+                                    ->first();
+
+
+        $wireOnSortOrderAdd = $this->attributes
+                                    ->whereStartsWith('wire:onSortOrderAdd')
+                                    ->first();
 
         $hasWireOnSortOrderChangeDirective = $wireOnSortOrderChange !== null;
-
+        $hasWireOnSortOrderAddDirective = $wireOnSortOrderAdd !== null;
         $hasDragHandle = $this->dragHandle !== null;
-
         $hasGroup = $this->group !== null;
 
-        return collect()
+        $collection = collect()
             ->push("animation = {$this->animation}")
             ->push("ghostClass = '{$this->ghostClass}'")
             ->push($hasDragHandle ? "dragHandle = '.{$this->dragHandle}'" : null)
-            ->push($hasGroup ? "group = '{$this->group}'" : null)
-            ->push($hasWireOnSortOrderChangeDirective ? 'wireComponent = $wire' : null)
-            ->push($hasWireOnSortOrderChangeDirective ? "wireOnSortOrderChange = '$wireOnSortOrderChange'" : null)
-            ->push('init()')
-            ->filter(function ($line) {
-                return $line !== null;
-            })
-            ->join('; ');
+            ->push($hasGroup ? "group = '{$this->group}'" : null);
+
+        $collection->push(($hasWireOnSortOrderChangeDirective || $hasWireOnSortOrderAddDirective) ? 'wireComponent = $wire' : null);
+
+        $collection->push($hasWireOnSortOrderChangeDirective ? "wireOnSortOrderChange = '$wireOnSortOrderChange'" : null);
+
+        $collection->push($hasWireOnSortOrderAddDirective ? "wireOnSortOrderAdd = '$wireOnSortOrderAdd'" : null);
+
+        return $collection->push('init()')->filter(function ($line) {
+                    return $line !== null;
+                })->join('; ');
     }
 
     public function render()
