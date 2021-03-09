@@ -10,6 +10,7 @@
 
             wireComponent: null,
             wireOnSortOrderChange: null,
+            wireOnSortOrderRemove: null,
             wireOnSortOrderAdd: null,
 
             init() {
@@ -21,9 +22,6 @@
                     .map(child => child.dataset.sortKey)
                     .filter( function(e) { return e })
                     .filter(sortKey => sortKey)
-
-
-
 
                 window.Sortable.create(this.$refs.root, {
                     sort: this.group == 'selected',
@@ -39,7 +37,7 @@
                             return from.options.group.name == 'selected' || to.options.group.name == 'selected';
                         },
                     },
-                    onRemove: evt => {
+                    onEnd: evt => {
                         if (!this.wireComponent) {
                             return;
                         }
@@ -53,6 +51,21 @@
                             .filter(sortKey => sortKey);
 
                         this.wireComponent.call(this.wireOnSortOrderChange, this.sortOrder)
+                    },
+                    onRemove: evt => {
+                        if (!this.wireComponent) {
+                            return;
+                        }
+
+                        if(!this.wireOnSortOrderRemove) {
+                            return;
+                        }
+
+                        this.sortOrder = [].slice.call(evt.from.children)
+                            .map(child => child.dataset.sortKey)
+                            .filter(sortKey => sortKey);
+
+                        this.wireComponent.call(this.wireOnSortOrderRemove, this.sortOrder)
                     },
                     onAdd: evt => {
                         if (!this.wireComponent) {

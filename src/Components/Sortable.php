@@ -50,7 +50,14 @@ class Sortable extends Component
                                     ->whereStartsWith('wire:onSortOrderAdd')
                                     ->first();
 
+        $wireOnSortOrderRemove = $this->attributes
+                                    ->whereStartsWith('wire:onSortOrderRemove')
+                                    ->first();
+
+
+
         $hasWireOnSortOrderChangeDirective = $wireOnSortOrderChange !== null;
+        $hasWireOnSortOrderRemoveDirective = $wireOnSortOrderRemove !== null;
         $hasWireOnSortOrderAddDirective = $wireOnSortOrderAdd !== null;
         $hasDragHandle = $this->dragHandle !== null;
         $hasGroup = $this->group !== null;
@@ -61,10 +68,10 @@ class Sortable extends Component
             ->push($hasDragHandle ? "dragHandle = '.{$this->dragHandle}'" : null)
             ->push($hasGroup ? "group = '{$this->group}'" : null);
 
-        $collection->push(($hasWireOnSortOrderChangeDirective || $hasWireOnSortOrderAddDirective) ? 'wireComponent = $wire' : null);
+        $collection->push(($hasWireOnSortOrderChangeDirective || $hasWireOnSortOrderAddDirective || $hasWireOnSortOrderRemoveDirective) ? 'wireComponent = $wire' : null);
 
         $collection->push($hasWireOnSortOrderChangeDirective ? "wireOnSortOrderChange = '$wireOnSortOrderChange'" : null);
-
+        $collection->push($hasWireOnSortOrderRemoveDirective ? "wireOnSortOrderRemove = '$wireOnSortOrderRemove'" : null);
         $collection->push($hasWireOnSortOrderAddDirective ? "wireOnSortOrderAdd = '$wireOnSortOrderAdd'" : null);
 
         return $collection->push('init()')->filter(function ($line) {
