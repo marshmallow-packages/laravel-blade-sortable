@@ -1,92 +1,57 @@
 <script>
     const laravelBladeSortable = () => {
         return {
+            name: '',
             sortOrder: [],
-            sortOrderSet: [],
             animation: 150,
             ghostClass: '',
             dragHandle: null,
             group: null,
+            allowSort: true,
+            allowDrop: true,
 
             wireComponent: null,
             wireOnSortOrderChange: null,
-            wireOnSortOrderRemove: null,
-            wireOnSortOrderAdd: null,
 
             init() {
-                this.sortOrder = [].slice.call(this.$refs.root.children)
-                    .map(child => child.dataset.sortKey)
-                    .filter( function(e) { return e })
-                    .filter(sortKey => sortKey)
-                this.sortOrderSet = [].slice.call(this.$refs.root.children)
-                    .map(child => child.dataset.sortKey)
-                    .filter( function(e) { return e })
-                    .filter(sortKey => sortKey)
+                this.sortOrder = this.computeSortOrderFromChildren()
 
                 window.Sortable.create(this.$refs.root, {
-                    sort: this.group == 'selected',
                     handle: this.dragHandle,
                     animation: this.animation,
                     ghostClass: this.ghostClass,
                     group: {
                         name: this.group,
-                        put: function (to, from) {
-                            return from.options.group.name == 'selected' || to.options.group.name == 'selected';
-                        },
-                        pull: function (to, from) {
-                            return from.options.group.name == 'selected' || to.options.group.name == 'selected';
-                        },
+                        put: this.allowDrop,
                     },
-                    onEnd: evt => {
-                        if (!this.wireComponent) {
-                            return;
-                        }
+                    sort: this.allowSort,
+                    onSort: evt => {
+                        const previousSortOrder = [...this.sortOrder]
+                        this.sortOrder = this.computeSortOrderFromChildren()
 
-                        if(!this.wireOnSortOrderChange) {
-                            return;
-                        }
-
-                        this.sortOrder = [].slice.call(evt.from.children)
-                            .map(child => child.dataset.sortKey)
-                            .filter(sortKey => sortKey);
-
-                        this.wireComponent.call(this.wireOnSortOrderChange, this.sortOrder)
-                    },
-                    onRemove: evt => {
-                        if (!this.wireComponent) {
-                            return;
-                        }
-
-                        if(!this.wireOnSortOrderRemove) {
-                            return;
-                        }
-
-                        this.sortOrder = [].slice.call(evt.from.children)
-                            .map(child => child.dataset.sortKey)
-                            .filter(sortKey => sortKey);
-
-                        this.wireComponent.call(this.wireOnSortOrderRemove, this.sortOrder)
-                    },
-                    onAdd: evt => {
                         if (!this.wireComponent) {
                             return
                         }
 
-                        if(!this.wireOnSortOrderAdd) {
-                            return
-                        }
+                        const from = evt?.from?.dataset?.name
+                        const to = evt?.to?.dataset?.name
 
-                        let slices = [].slice.call(evt.to.children)
-                                        .filter( function(e) { return e })
-                                        .map(child => child.dataset.sortKey)
-                                        .filter(sortKey => sortKey);
-                        slices = slices.filter(function(value, index){ return slices.indexOf(value) == index });
-
-                        this.sortOrderSet = slices;
-
-                        this.wireComponent.call(this.wireOnSortOrderAdd, this.sortOrderSet)
-                    }
+                        this.wireComponent.call(
+                            this.wireOnSortOrderChange,
+                            this.sortOrder,
+                            previousSortOrder,
+                            this.name,
+                            from,
+                            to,
+                        )
+                    },
                 });
+            },
+
+            computeSortOrderFromChildren() {
+                return [].slice.call(this.$refs.root.children)
+                    .map(child => child.dataset.sortKey)
+                    .filter(sortKey => sortKey)
             }
         }
     }

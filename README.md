@@ -168,6 +168,7 @@ sorting event happens and will call the specified method/callback.
 
 ```blade
 <x-laravel-blade-sortable::sortable
+    name="dropzone"
     wire:onSortOrderChange="handleSortOrderChange"
 >
     {{-- Items here --}}
@@ -179,6 +180,19 @@ method will be called passing as argument an array with your items' `sort-key` i
 current order.
 
 ![livewire](https://github.com/asantibanez/laravel-blade-sortable/raw/master/examples/livewire.gif)
+
+Extra info is passed along too, so you can check extra data when processing the sort order
+
+```php
+public function handleOnSortOrderChanged($sortOrder, $previousSortOrder, $name, $from, $to)
+{
+    // $sortOrder = new keys order
+    // $previousSortOrder = keys previous order
+    // $name = drop target name
+    // $from = name of drop target from where the dragged/sorted item came from
+    // $to = name of drop target to where the dragged/sorted item was placed
+}
+```
 
 ### Customization
 
@@ -222,6 +236,25 @@ Just add a `group` string prop to a `laravel-blade-sortable::sortable` component
 ```
 
 ![drag-drop](https://github.com/asantibanez/laravel-blade-sortable/raw/master/examples/drag-drop.gif)
+
+### Enable/Disable sorting and/or drop
+
+Use `:allow-sort=true|false` and `:allow-drop=true|false` to `x-laravel-blade-sortable::sortable` components
+to enable/disable sorting and/or drop of elements.
+
+Both defaults to `true`.
+
+```blade
+<x-laravel-blade-sortable::sortable
+    group="people"
+    :allow-sort="false"
+    :allow-drop="false"
+>
+    {{-- Items here --}}
+</x-laravel-blade-sortable::sortable>
+```
+
+![disable-sort-drop](https://github.com/asantibanez/laravel-blade-sortable/raw/master/examples/disable-sort-drop.gif)
 
 ### Testing
 

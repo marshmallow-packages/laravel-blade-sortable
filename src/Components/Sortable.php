@@ -22,13 +22,19 @@ class Sortable extends Component
 
     public $group;
 
+    public $allowDrop;
+
+    public $allowSort;
+
     public function __construct($as = null,
                                 $component = null,
                                 $name = null,
                                 $animation = 150,
                                 $ghostClass = '',
                                 $dragHandle = null,
-                                $group = null)
+                                $group = null,
+                                $allowSort = true,
+                                $allowDrop = true)
     {
         $this->as = $as;
         $this->component = $component;
@@ -37,46 +43,35 @@ class Sortable extends Component
         $this->ghostClass = $ghostClass;
         $this->dragHandle = $dragHandle;
         $this->group = $group;
+        $this->allowDrop = $allowDrop;
+        $this->allowSort = $allowSort;
     }
 
     public function xInit()
     {
-        $wireOnSortOrderChange = $this->attributes
-                                    ->whereStartsWith('wire:onSortOrderChange')
-                                    ->first();
-
-
-        $wireOnSortOrderAdd = $this->attributes
-                                    ->whereStartsWith('wire:onSortOrderAdd')
-                                    ->first();
-
-        $wireOnSortOrderRemove = $this->attributes
-                                    ->whereStartsWith('wire:onSortOrderRemove')
-                                    ->first();
-
-
+        $wireOnSortOrderChange = $this->attributes->whereStartsWith('wire:onSortOrderChange')->first();
 
         $hasWireOnSortOrderChangeDirective = $wireOnSortOrderChange !== null;
-        $hasWireOnSortOrderRemoveDirective = $wireOnSortOrderRemove !== null;
-        $hasWireOnSortOrderAddDirective = $wireOnSortOrderAdd !== null;
+
         $hasDragHandle = $this->dragHandle !== null;
+
         $hasGroup = $this->group !== null;
 
-        $collection = collect()
+        return collect()
+            ->push("name = '{$this->name}'")
             ->push("animation = {$this->animation}")
             ->push("ghostClass = '{$this->ghostClass}'")
             ->push($hasDragHandle ? "dragHandle = '.{$this->dragHandle}'" : null)
-            ->push($hasGroup ? "group = '{$this->group}'" : null);
-
-        $collection->push(($hasWireOnSortOrderChangeDirective || $hasWireOnSortOrderAddDirective || $hasWireOnSortOrderRemoveDirective) ? 'wireComponent = $wire' : null);
-
-        $collection->push($hasWireOnSortOrderChangeDirective ? "wireOnSortOrderChange = '$wireOnSortOrderChange'" : null);
-        $collection->push($hasWireOnSortOrderRemoveDirective ? "wireOnSortOrderRemove = '$wireOnSortOrderRemove'" : null);
-        $collection->push($hasWireOnSortOrderAddDirective ? "wireOnSortOrderAdd = '$wireOnSortOrderAdd'" : null);
-
-        return $collection->push('init()')->filter(function ($line) {
-                    return $line !== null;
-                })->join('; ');
+            ->push($hasGroup ? "group = '{$this->group}'" : null)
+            ->push($hasWireOnSortOrderChangeDirective ? 'wireComponent = $wire' : null)
+            ->push($hasWireOnSortOrderChangeDirective ? "wireOnSortOrderChange = '$wireOnSortOrderChange'" : null)
+            ->push($this->allowSort ? 'allowSort = true' : 'allowSort = false')
+            ->push($this->allowDrop ? 'allowDrop = true' : 'allowDrop = false')
+            ->push('init()')
+            ->filter(function ($line) {
+                return $line !== null;
+            })
+            ->join('; ');
     }
 
     public function render()

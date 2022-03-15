@@ -2,20 +2,22 @@
     "name": "marshmallow/laravel-blade-sortable",
     "description": "Custom Blade components to add sortable/drag-and-drop HTML elements in your apps",
     "keywords": [
-        "marshmallow",
+        "asantibanez",
         "laravel-blade-sortable"
     ],
     "homepage": "https://github.com/asantibanez/laravel-blade-sortable",
     "license": "MIT",
     "type": "library",
-    "authors": [{
-        "name": "Andrés Santibáñez",
-        "email": "santibanez.andres@gmail.com",
-        "role": "Developer"
-    }],
+    "authors": [
+        {
+            "name": "Andrés Santibáñez",
+            "email": "santibanez.andres@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "php": "^7.2|^7.3|^7.4|^8.0",
-        "illuminate/support": "^7.0|^8.0"
+        "php": "^8.0|^8.1",
+        "illuminate/support": "^8.0|^9.0"
     },
     "require-dev": {
         "orchestra/testbench": "^5.0|^6.0",
@@ -34,7 +36,6 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-
     },
     "config": {
         "sort-packages": true
